@@ -62,6 +62,7 @@ function transactionTypeLabel(type) {
 function TabNavigation({ urlParams, location, service }) {
   const { serviceName, transactionType } = urlParams;
   const errorsSelected = location.pathname.includes('/errors');
+  const cpuSelected = location.pathname.includes('/cpu');
   const { types } = service.data;
 
   return (
@@ -80,7 +81,7 @@ function TabNavigation({ urlParams, location, service }) {
           >
             <NavLink
               path={`/${serviceName}/transactions/${encodeURIComponent(type)}`}
-              selected={transactionType === type && !errorsSelected}
+              selected={transactionType === type && !errorsSelected && !cpuSelected}
             >
               {label}
             </NavLink>
@@ -93,6 +94,10 @@ function TabNavigation({ urlParams, location, service }) {
       <Divider />
       <TabLink path={`/${serviceName}/errors`} selected={errorsSelected}>
         Errors
+      </TabLink>
+      <Divider />
+      <TabLink path={`/${serviceName}/cpu`} selected={cpuSelected}>
+        CPU
       </TabLink>
     </Container>
   );

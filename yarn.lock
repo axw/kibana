@@ -8334,6 +8334,10 @@ mem@^1.1.0:
   dependencies:
     mimic-fn "^1.0.0"
 
+memoize-one@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-3.1.1.tgz#ef609811e3bc28970eac2884eece64d167830d17"
+
 memory-fs@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.2.0.tgz#f2bb25368bc121e391c2520de92969caee0a0290"
@@ -10205,6 +10209,13 @@ react-draggable@3.x, "react-draggable@^2.2.6 || ^3.0.3":
     classnames "^2.2.5"
     prop-types "^15.6.0"
 
+react-flame-graph@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-flame-graph/-/react-flame-graph-1.0.3.tgz#b721b5b52fd49460edc1a9811e8862b6b8a78a69"
+  dependencies:
+    memoize-one "^3.1.1"
+    react-window "^1"
+
 react-grid-layout@^0.16.2:
   version "0.16.6"
   resolved "https://registry.yarnpkg.com/react-grid-layout/-/react-grid-layout-0.16.6.tgz#9b2407a2b946c2260ebaf66f13b556e1da4efeb2"
@@ -10378,6 +10389,12 @@ react-vis@^1.8.1:
     global "^4.3.1"
     prop-types "^15.5.8"
     react-motion "^0.5.2"
+
+react-window@^1:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-1.0.3.tgz#cfcda72782daef01a6d21a1fd9492b5451df0057"
+  dependencies:
+    memoize-one "^3.1.1"
 
 react@>=0.13.3, react@^16.2.0:
   version "16.2.0"

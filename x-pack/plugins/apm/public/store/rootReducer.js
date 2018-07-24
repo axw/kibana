@@ -21,6 +21,7 @@ import transaction from './transaction';
 import transactionDistribution from './transactionDistribution';
 import transactionList from './transactionList';
 import urlParams from './urlParams';
+import cpuSamples from './cpusamples';
 
 const rootReducer = combineReducers({
   detailsCharts,
@@ -37,7 +38,8 @@ const rootReducer = combineReducers({
   transaction,
   transactionDistribution,
   transactionList,
-  urlParams
+  urlParams,
+  cpuSamples
 });
 
 export default rootReducer;

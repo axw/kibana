@@ -9,6 +9,7 @@ import { Redirect } from 'react-router-dom';
 import ServiceOverview from '../ServiceOverview';
 import ErrorGroupDetails from '../ErrorGroupDetails';
 import ErrorGroupOverview from '../ErrorGroupOverview';
+import CPUOverview from '../CPUOverview';
 import TransactionDetails from '../TransactionDetails';
 import TransactionOverview from '../TransactionOverview';
 import { legacyDecodeURIComponent } from '../../../utils/url';
@@ -31,6 +32,12 @@ export const routes = [
     path: '/:serviceName/errors',
     component: ErrorGroupOverview,
     breadcrumb: 'Errors'
+  },
+  {
+    exact: true,
+    path: '/:serviceName/cpu',
+    component: CPUOverview,
+    breadcrumb: 'CPU'
   },
   {
     switch: true,

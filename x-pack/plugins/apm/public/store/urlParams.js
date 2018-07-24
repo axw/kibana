@@ -96,6 +96,10 @@ function getPathParams(pathname) {
         serviceName: paths[0],
         errorGroupId: paths[2]
       };
+    case 'cpu':
+      return {
+        serviceName: paths[0],
+      };
     default:
       return {};
   }

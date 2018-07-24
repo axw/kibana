@@ -246,3 +246,15 @@ export async function createWatch(id, watch) {
     body: JSON.stringify({ type: 'json', id, watch })
   });
 }
+
+export async function loadCpuSamples({ serviceName, start, end }) {
+  return callApi({
+    pathname: chrome.addBasePath(
+      `/api/apm/services/${serviceName}/cpu`
+    ),
+    query: {
+      start,
+      end
+    }
+  });
+}
