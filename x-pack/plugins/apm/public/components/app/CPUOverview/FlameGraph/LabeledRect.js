@@ -2,6 +2,10 @@
 
 import React from 'react';
 import { minWidthToDisplayText, textHeight } from './constants';
+import {
+  EuiToolTip,
+  EuiText,
+} from '@elastic/eui';
 
 type Props = {|
   backgroundColor: string,
@@ -10,10 +14,17 @@ type Props = {|
   isDimmed?: boolean,
   label: string,
   onClick: Function,
+  onMouseOver: Function,
+  onMouseOut: Function,
   width: number,
   x: number,
   y: number,
 |};
+
+const spanStyle = {
+  transition: 'all ease-in-out 200ms',
+  display: 'block',
+};
 
 const gStyle = {
   transition: 'all ease-in-out 200ms'
@@ -53,8 +64,11 @@ const LabeledRect = ({
   color,
   height,
   isDimmed = false,
+  isHovered = false,
   label,
   onClick,
+  onMouseOver,
+  onMouseOut,
   width,
   x,
   y,
@@ -67,6 +81,8 @@ const LabeledRect = ({
       height={height}
       fill={backgroundColor}
       onClick={onClick}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
       style={Object.assign({}, rectStyle, {opacity: isDimmed ? 0.5 : 1})}
     />
     {width >= minWidthToDisplayText && (

@@ -42,6 +42,7 @@ export function transformChartData(rawData: RawData): ChartData {
       left: leftOffset,
       name,
       width: value / maxValue,
+      value: value,
     });
 
     // Register the node's depth within the graph.

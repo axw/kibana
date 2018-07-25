@@ -13,7 +13,8 @@ import { getKey } from '../../../store/apiHelpers';
 //import { FlameGraph } from 'react-flame-graph';
 import { FlameGraph } from './FlameGraph';
 import {
-  EuiLoadingChart,
+  EuiToolTip,
+  EuiText,
 } from '@elastic/eui';
 
 function maybeLoadList(props) {
@@ -42,17 +43,7 @@ class CPUOverview extends Component {
     const { license, location, cpuSamples } = this.props;
     const { serviceName } = this.props.urlParams;
 
-    if (cpuSamples.status == "SUCCESS") {
-      return (
-        <div>
-          <HeaderContainer>
-            <h1>{serviceName}</h1>
-          </HeaderContainer>
-          <TabNavigation />
-          <FlameGraph data={cpuSamples.data.tree} height={1500} width={1500} />
-        </div>
-      );
-    }
+    // TODO(axw) auto-size flamegraph
 
     return (
       <div>
@@ -60,7 +51,12 @@ class CPUOverview extends Component {
           <h1>{serviceName}</h1>
         </HeaderContainer>
         <TabNavigation />
-	<EuiLoadingChart size="xl"/>
+        {cpuSamples.status == "SUCCESS" &&
+          <FlameGraph
+	    data={cpuSamples.data.tree}
+	    height={1500} width={1500}
+	  />
+	}
       </div>
     );
   }

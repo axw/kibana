@@ -7,6 +7,7 @@ export type ChartNode = {|
   left: number,
   name: string,
   width: number,
+  value: number,
 |};
 
 export type ChartData = {|
@@ -19,7 +20,9 @@ export type ChartData = {|
 export type ItemData = {|
   data: ChartData,
   focusedNode: ChartNode,
+  hoveredNode: ChartNode,
   focusNode: (chartNode: ChartNode) => void,
+  hoverNode: (chartNode: ChartNode) => void,
   scale: (value: number) => number,
 |};
 

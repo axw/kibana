@@ -19,7 +19,7 @@ export default class ItemRenderer extends PureComponent<Props, void> {
   render() {
     const { data: itemData, index, style } = this.props;
 
-    const { data, focusedNode, scale } = itemData;
+    const { data, focusedNode, hoveredNode, scale } = itemData;
 
     const uids = data.levels[index];
     const focusedNodeLeft = scale(focusedNode.left);
@@ -56,9 +56,12 @@ export default class ItemRenderer extends PureComponent<Props, void> {
           color={node.color}
           height={rowHeight}
           isDimmed={index < focusedNode.depth}
+          isHovered={index == (hoveredNode||{}).depth}
           key={uid}
           label={node.name}
           onClick={() => itemData.focusNode(node)}
+          onMouseOver={() => itemData.hoverNode(node)}
+          onMouseOut={() => itemData.hoverNode(null)}
           width={nodeWidth}
           x={nodeLeft - focusedNodeLeft}
           y={top}
