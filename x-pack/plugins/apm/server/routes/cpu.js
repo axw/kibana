@@ -7,6 +7,7 @@
 import Joi from 'joi';
 import Boom from 'boom';
 
+import getCpuSamples from '../lib/cpu/get_cpu_samples';
 import { setupRequest } from '../lib/helpers/setup_request';
 import { dateValidation } from '../lib/helpers/date_validation';
 
@@ -32,34 +33,35 @@ server.route({
     }
   },
   handler: (req, reply) => {
-      //const { serviceName } = req.params;
-      //const { setup } = req.pre;
+    const { serviceName } = req.params;
+    const { setup } = req.pre;
 
-	    /*
-      return getTopTransactions({
-        serviceName,
-        transactionType,
-        setup
-      })
-        .then(reply)
-        .catch(defaultErrorHandler(reply));
-	*/
-    reply({
-      tree: {
-        name: 'root',
-        value: 5,
-        children: [
-          {
-            name: 'a',
-            value: 1,
-          },
-          {
-            name: 'b',
-            value: 2,
-          }
-        ]
-      }
-    });
+    getCpuSamples({serviceName, setup}).then(function(res) {
+      // getCpuSamples returns a list of nodes.
+      // The UI expects a nested tree structure.
+      var treeNodes = {};
+      res.nodes.forEach(function(node) {
+        treeNodes[node.node_id] = {
+          name: node.function,
+          // TODO(axw) how will we convey that
+          // the sum of cpu_ns is not 100% CPU?
+          // Need to be able to send additional
+          // data back (namely duration_ns).
+          value: node.cpu_ns,
+	};
+      });
+      res.nodes.forEach(function(node) {
+	var parent = treeNodes[node.parent_id];
+        if (!parent) {
+	  return;
+	}
+	if (!parent.children) {
+          parent.children = [];
+	}
+        parent.children.push(treeNodes[node.node_id]);
+      });
+      reply({tree: treeNodes['root']});
+    }).catch(defaultErrorHandler(reply));
   }
 });
 

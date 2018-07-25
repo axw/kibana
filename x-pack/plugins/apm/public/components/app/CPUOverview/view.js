@@ -10,7 +10,11 @@ import withErrorHandler from '../../shared/withErrorHandler';
 import { HeaderContainer } from '../../shared/UIComponents';
 import TabNavigation from '../../shared/TabNavigation';
 import { getKey } from '../../../store/apiHelpers';
-import { FlameGraph } from 'react-flame-graph';
+//import { FlameGraph } from 'react-flame-graph';
+import { FlameGraph } from './FlameGraph';
+import {
+  EuiLoadingChart,
+} from '@elastic/eui';
 
 function maybeLoadList(props) {
   const { serviceName, start, end } = props.urlParams;
@@ -38,16 +42,25 @@ class CPUOverview extends Component {
     const { license, location, cpuSamples } = this.props;
     const { serviceName } = this.props.urlParams;
 
+    if (cpuSamples.status == "SUCCESS") {
+      return (
+        <div>
+          <HeaderContainer>
+            <h1>{serviceName}</h1>
+          </HeaderContainer>
+          <TabNavigation />
+          <FlameGraph data={cpuSamples.data.tree} height={1500} width={1500} />
+        </div>
+      );
+    }
+
     return (
       <div>
         <HeaderContainer>
           <h1>{serviceName}</h1>
         </HeaderContainer>
         <TabNavigation />
-
-        {cpuSamples.data.tree &&
-        <FlameGraph data={cpuSamples.data.tree} height={800} width={800} />
-	}
+	<EuiLoadingChart size="xl"/>
       </div>
     );
   }
