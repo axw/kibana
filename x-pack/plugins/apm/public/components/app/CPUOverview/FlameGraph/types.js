@@ -5,6 +5,7 @@ export type ChartNode = {|
   color: string,
   depth: number,
   left: number,
+  uid: any,
   name: string,
   width: number,
   value: number,

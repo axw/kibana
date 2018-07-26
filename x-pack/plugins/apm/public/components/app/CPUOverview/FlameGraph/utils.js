@@ -40,6 +40,7 @@ export function transformChartData(rawData: RawData): ChartData {
       color: getNodeColor(value, maxValue),
       depth,
       left: leftOffset,
+      uid: uidCounter,
       name,
       width: value / maxValue,
       value: value,

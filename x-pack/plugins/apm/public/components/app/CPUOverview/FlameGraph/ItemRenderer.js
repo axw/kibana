@@ -56,7 +56,7 @@ export default class ItemRenderer extends PureComponent<Props, void> {
           color={node.color}
           height={rowHeight}
           isDimmed={index < focusedNode.depth}
-          isHovered={index == (hoveredNode||{}).depth}
+          isHovered={uid == (hoveredNode||{}).uid}
           key={uid}
           label={node.name}
           onClick={() => itemData.focusNode(node)}
