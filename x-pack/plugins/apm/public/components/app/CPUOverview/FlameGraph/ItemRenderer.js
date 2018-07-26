@@ -59,6 +59,7 @@ export default class ItemRenderer extends PureComponent<Props, void> {
           isHovered={uid == (hoveredNode||{}).uid}
           key={uid}
           label={node.name}
+          details={() => itemData.nodeDetails(node)}
           onClick={() => itemData.focusNode(node)}
           onMouseOver={() => itemData.hoverNode(node)}
           onMouseOut={() => itemData.hoverNode(null)}

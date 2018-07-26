@@ -24,6 +24,7 @@ export type ItemData = {|
   hoveredNode: ChartNode,
   focusNode: (chartNode: ChartNode) => void,
   hoverNode: (chartNode: ChartNode) => void,
+  nodeDetails: (chartNode: ChartNode) => any,
   scale: (value: number) => number,
 |};
 

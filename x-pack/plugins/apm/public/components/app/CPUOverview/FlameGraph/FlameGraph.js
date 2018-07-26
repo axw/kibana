@@ -7,6 +7,7 @@ import { FixedSizeList as List } from 'react-window';
 import memoize from 'memoize-one';
 import ItemRenderer from './ItemRenderer';
 import { rowHeight } from './constants';
+import { asTime } from '../../../../utils/formatters';
 
 type Props = {|
   data: ChartData,
@@ -30,12 +31,13 @@ export default class FlameGraph extends PureComponent<Props, State> {
   // Memoize this wrapper object to avoid breaking PureComponent's sCU.
   // Attach the memoized function to the instance,
   // So that multiple instances will maintain their own memoized cache.
-  getItemData = memoize((data, focusedNode, hoveredNode, focusNode, hoverNode, width) => ({
+  getItemData = memoize((data, focusedNode, hoveredNode, focusNode, hoverNode, nodeDetails, width) => ({
     data,
     focusedNode,
     hoveredNode,
     focusNode,
     hoverNode,
+    nodeDetails,
     scale: value => value / focusedNode.width * width,
   }));
 
@@ -43,7 +45,7 @@ export default class FlameGraph extends PureComponent<Props, State> {
     const { data, height, width } = this.props;
     const { focusedNode, hoveredNode } = this.state;
 
-    const itemData = this.getItemData(data, focusedNode, hoveredNode, this.focusNode, this.hoverNode, width);
+    const itemData = this.getItemData(data, focusedNode, hoveredNode, this.focusNode, this.hoverNode, this.nodeDetails, width);
 
     return (
       <List
@@ -68,4 +70,20 @@ export default class FlameGraph extends PureComponent<Props, State> {
     this.setState({
       hoveredNode: chartNode,
     });
+
+  // TODO(axw) attach total sampled duration
+  // to the nodes, and use that to display the
+  // node's percentage of that duration, e.g.
+  //
+  //   "10ms (10% of 100ms)"
+  //
+  // TODO(axw) also show flat value? e.g.
+  //
+  //   "10ms (10% of 100ms)"
+  //   "1ms in this node, 9ms in callees"
+  nodeDetails = (chartNode: ChartNode) => (
+    <div>
+    <p>{asTime(chartNode.value/1000)}</p>
+    </div>
+  );
 }

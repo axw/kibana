@@ -3,7 +3,9 @@
 import React from 'react';
 import { minWidthToDisplayText, textHeight } from './constants';
 import {FlameGraphToolTip} from './tool_tip';
-import {EuiText} from '@elastic/eui';
+import {
+  EuiBasicTable,
+} from '@elastic/eui';
 
 type Props = {|
   backgroundColor: string,
@@ -11,6 +13,7 @@ type Props = {|
   height: number,
   isDimmed?: boolean,
   label: string,
+  details: Function,
   onClick: Function,
   onMouseOver: Function,
   onMouseOut: Function,
@@ -64,6 +67,7 @@ const LabeledRect = ({
   isDimmed = false,
   isHovered = false,
   label,
+  details,
   onClick,
   onMouseOver,
   onMouseOut,
@@ -85,7 +89,7 @@ const LabeledRect = ({
     />
     {isHovered && (
       <foreignObject width={width} height={height} style={{pointerEvents: "none"}}>
-        <FlameGraphToolTip position="right" title={<span>{label}</span>} content={label}/>
+        <FlameGraphToolTip position="bottom" title={<span>{label}</span>} content={details()}/>
       </foreignObject>
     )}
     {width >= minWidthToDisplayText && (
