@@ -3,6 +3,7 @@
 import type { ChartData, ChartNode } from './types';
 
 import React, { PureComponent } from 'react';
+import ReactDOM from 'react-dom';
 import { FixedSizeList as List } from 'react-window';
 import memoize from 'memoize-one';
 import ItemRenderer from './ItemRenderer';
@@ -12,7 +13,7 @@ import { asTime } from '../../../../utils/formatters';
 type Props = {|
   data: ChartData,
   height: number,
-  width: number,
+  duration: number,
 |};
 
 type State = {|
@@ -41,9 +42,18 @@ export default class FlameGraph extends PureComponent<Props, State> {
     scale: value => value / focusedNode.width * width,
   }));
 
+  componentDidMount() {
+    const parentNode = ReactDOM.findDOMNode(this).parentNode;
+    const {width, height} = parentNode.getBoundingClientRect();
+    this.setState({width: width, height: height});
+  }
+
   render() {
-    const { data, height, width } = this.props;
-    const { focusedNode, hoveredNode } = this.state;
+    const { data, height } = this.props;
+    const { focusedNode, hoveredNode, width } = this.state;
+    if (!width) {
+      return (<div/>);
+    }
 
     const itemData = this.getItemData(data, focusedNode, hoveredNode, this.focusNode, this.hoverNode, this.nodeDetails, width);
 
@@ -71,19 +81,12 @@ export default class FlameGraph extends PureComponent<Props, State> {
       hoveredNode: chartNode,
     });
 
-  // TODO(axw) attach total sampled duration
-  // to the nodes, and use that to display the
-  // node's percentage of that duration, e.g.
+  // TODO(axw) also show flat/self value? e.g.
   //
-  //   "10ms (10% of 100ms)"
-  //
-  // TODO(axw) also show flat value? e.g.
-  //
-  //   "10ms (10% of 100ms)"
-  //   "1ms in this node, 9ms in callees"
+  //   "1ms in this node, 9ms total"
   nodeDetails = (chartNode: ChartNode) => (
     <div>
-    <p>{asTime(chartNode.value/1000)}</p>
+    <p>{asTime(chartNode.value/1000)} ({chartNode.value/this.props.duration*100}% of {asTime(this.props.duration/1000)})</p>
     </div>
   );
 }

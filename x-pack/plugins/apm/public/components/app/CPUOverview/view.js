@@ -10,8 +10,8 @@ import withErrorHandler from '../../shared/withErrorHandler';
 import { HeaderContainer } from '../../shared/UIComponents';
 import TabNavigation from '../../shared/TabNavigation';
 import { getKey } from '../../../store/apiHelpers';
-//import { FlameGraph } from 'react-flame-graph';
 import { FlameGraph } from './FlameGraph';
+import { asTime } from '../../../utils/formatters';
 import {
   EuiToolTip,
   EuiText,
@@ -43,7 +43,7 @@ class CPUOverview extends Component {
     const { license, location, cpuSamples } = this.props;
     const { serviceName } = this.props.urlParams;
 
-    // TODO(axw) auto-size flamegraph
+    // TODO(axw) calculate flamegraph height from amount of data?
 
     return (
       <div>
@@ -52,10 +52,7 @@ class CPUOverview extends Component {
         </HeaderContainer>
         <TabNavigation />
         {cpuSamples.status == "SUCCESS" &&
-          <FlameGraph
-	    data={cpuSamples.data.tree}
-	    height={1500} width={1500}
-	  />
+          <FlameGraph data={cpuSamples.data.tree} height={1000} duration={cpuSamples.data.durationNs}/>
 	}
       </div>
     );

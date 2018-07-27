@@ -39,15 +39,16 @@ server.route({
     getCpuSamples({serviceName, setup}).then(function(res) {
       // getCpuSamples returns a list of nodes.
       // The UI expects a nested tree structure.
+      let duration_ns;
       var treeNodes = {};
       res.nodes.forEach(function(node) {
+        if (node.node_id == 'root') {
+          duration_ns = node.duration_ns;
+	}
         treeNodes[node.node_id] = {
           name: node.function,
-          // TODO(axw) how will we convey that
-          // the sum of cpu_ns is not 100% CPU?
-          // Need to be able to send additional
-          // data back (namely duration_ns).
           value: node.cpu_ns,
+          samples: node.samples_count,
 	};
       });
       res.nodes.forEach(function(node) {
@@ -60,7 +61,10 @@ server.route({
 	}
         parent.children.push(treeNodes[node.node_id]);
       });
-      reply({tree: treeNodes['root']});
+      reply({
+          tree: treeNodes['root'],
+          duration_ns: duration_ns,
+      });
     }).catch(defaultErrorHandler(reply));
   }
 });
