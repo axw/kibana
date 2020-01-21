@@ -23,6 +23,7 @@ import { getLocalUIFilters } from '../lib/ui_filters/local_ui_filters';
 import { getServicesProjection } from '../../common/projections/services';
 import { getTransactionGroupsProjection } from '../../common/projections/transaction_groups';
 import { getMetricsProjection } from '../../common/projections/metrics';
+import { getProfilesProjection } from '../../common/projections/profiles';
 import { getErrorGroupsProjection } from '../../common/projections/errors';
 import { getTransactionsProjection } from '../../common/projections/transactions';
 import { createRoute } from './create_route';
@@ -186,6 +187,22 @@ export const metricsLocalFiltersRoute = createLocalFiltersRoute({
     }),
     t.partial({
       serviceNodeName: t.string
+    })
+  ])
+});
+
+export const profilesLocalFiltersRoute = createLocalFiltersRoute({
+  path: '/api/apm/ui_filters/local_filters/profiles',
+  getProjection: ({ setup, query }) => {
+    const { serviceName, serviceNodeName } = query;
+    return getMetricsProjection({
+      setup,
+      serviceName
+    });
+  },
+  queryRt: t.intersection([
+    t.type({
+      serviceName: t.string
     })
   ])
 });

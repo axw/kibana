@@ -10,12 +10,14 @@ import { EuiTabs, EuiSpacer } from '@elastic/eui';
 import { ErrorGroupOverview } from '../ErrorGroupOverview';
 import { TransactionOverview } from '../TransactionOverview';
 import { ServiceMetrics } from '../ServiceMetrics';
+import { ServiceProfile } from '../ServiceProfile';
 import { isRumAgentName, isJavaAgentName } from '../../../../common/agent_name';
 import { EuiTabLink } from '../../shared/EuiTabLink';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 import { TransactionOverviewLink } from '../../shared/Links/apm/TransactionOverviewLink';
 import { ErrorOverviewLink } from '../../shared/Links/apm/ErrorOverviewLink';
 import { MetricOverviewLink } from '../../shared/Links/apm/MetricOverviewLink';
+import { ProfileOverviewLink } from '../../shared/Links/apm/ProfileOverviewLink';
 import { ServiceNodeOverviewLink } from '../../shared/Links/apm/ServiceNodeOverviewLink';
 import { ServiceNodeOverview } from '../ServiceNodeOverview';
 import { useAgentName } from '../../../hooks/useAgentName';
@@ -93,6 +95,19 @@ export function ServiceDetailTabs({ tab }: Props) {
     };
     tabs.push(metricsTab);
   }
+
+  const profileTab = {
+    link: (
+      <ProfileOverviewLink serviceName={serviceName}>
+        {i18n.translate('xpack.apm.serviceDetails.profileTabLabel', {
+          defaultMessage: 'Profile'
+        })}
+      </ProfileOverviewLink>
+    ),
+    render: () => <ServiceProfile />,
+    name: 'profile'
+  };
+  tabs.push(profileTab);
 
   const serviceMapTab = {
     link: (

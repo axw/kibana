@@ -98,6 +98,11 @@ export function getPathParams(pathname: string = ''): PathParams {
             serviceName,
             serviceNodeName
           };
+        case 'profile':
+          return {
+            processorEvent: ProcessorEvent.profile,
+            serviceName
+          };
         case 'nodes':
           return {
             processorEvent: ProcessorEvent.metric,

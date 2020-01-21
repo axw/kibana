@@ -36,6 +36,7 @@ export function mergeConfigs(apmOssConfig: APMOSSConfig, apmConfig: APMXPackConf
     'apm_oss.metricsIndices': apmOssConfig.metricsIndices,
     'apm_oss.sourcemapIndices': apmOssConfig.sourcemapIndices,
     'apm_oss.onboardingIndices': apmOssConfig.onboardingIndices,
+    'apm_oss.profileIndices': apmOssConfig.profileIndices,
     'apm_oss.indexPattern': apmOssConfig.indexPattern,
     'xpack.apm.serviceMapEnabled': apmConfig.serviceMapEnabled,
     'xpack.apm.serviceMapInitialTimeRange': apmConfig.serviceMapInitialTimeRange,

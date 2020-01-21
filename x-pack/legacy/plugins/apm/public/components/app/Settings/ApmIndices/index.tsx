@@ -64,6 +64,12 @@ const APM_INDEX_LABELS = [
     label: i18n.translate('xpack.apm.settings.apmIndices.metricsIndicesLabel', {
       defaultMessage: 'Metrics Indices'
     })
+  },
+  {
+    configurationName: 'apm_oss.profileIndices',
+    label: i18n.translate('xpack.apm.settings.apmIndices.profileIndicesLabel', {
+      defaultMessage: 'Profile Indices'
+    })
   }
 ];
 

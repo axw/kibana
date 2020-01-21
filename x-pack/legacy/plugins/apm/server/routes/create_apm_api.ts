@@ -39,6 +39,7 @@ import { metricsChartsRoute } from './metrics';
 import { serviceNodesRoute } from './service_nodes';
 import { tracesRoute, tracesByIdRoute } from './traces';
 import { transactionByTraceIdRoute } from './transaction';
+import { profileRoute } from './profile';
 import {
   transactionGroupsBreakdownRoute,
   transactionGroupsChartsRoute,
@@ -50,6 +51,7 @@ import {
 import {
   errorGroupsLocalFiltersRoute,
   metricsLocalFiltersRoute,
+  profilesLocalFiltersRoute,
   servicesLocalFiltersRoute,
   tracesLocalFiltersRoute,
   transactionGroupsLocalFiltersRoute,
@@ -112,6 +114,7 @@ const createApmApi = () => {
     // UI filters
     .add(errorGroupsLocalFiltersRoute)
     .add(metricsLocalFiltersRoute)
+    .add(profilesLocalFiltersRoute)
     .add(servicesLocalFiltersRoute)
     .add(tracesLocalFiltersRoute)
     .add(transactionGroupsLocalFiltersRoute)
@@ -124,7 +127,10 @@ const createApmApi = () => {
 
     // Service map
     .add(serviceMapRoute)
-    .add(serviceMapServiceNodeRoute);
+    .add(serviceMapServiceNodeRoute)
+
+    // Profile
+    .add(profileRoute);
 
   return api;
 };

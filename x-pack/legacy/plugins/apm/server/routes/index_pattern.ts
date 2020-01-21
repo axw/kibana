@@ -27,6 +27,7 @@ export const dynamicIndexPatternRoute = createRoute(() => ({
       processorEvent: t.union([
         t.literal('transaction'),
         t.literal('metric'),
+        t.literal('profile'),
         t.literal('error')
       ])
     })

@@ -22,6 +22,7 @@ export interface ApmIndicesConfig {
   'apm_oss.spanIndices': string;
   'apm_oss.transactionIndices': string;
   'apm_oss.metricsIndices': string;
+  'apm_oss.profileIndices': string;
   apmAgentConfigurationIndex: string;
 }
 
@@ -49,6 +50,7 @@ export function getApmIndicesConfig(config: APMConfig): ApmIndicesConfig {
     'apm_oss.spanIndices': config['apm_oss.spanIndices'],
     'apm_oss.transactionIndices': config['apm_oss.transactionIndices'],
     'apm_oss.metricsIndices': config['apm_oss.metricsIndices'],
+    'apm_oss.profileIndices': config['apm_oss.profileIndices'],
     // system indices, not configurable
     apmAgentConfigurationIndex: '.apm-agent-configuration'
   };
@@ -78,7 +80,8 @@ const APM_UI_INDICES: ApmIndicesName[] = [
   'apm_oss.onboardingIndices',
   'apm_oss.spanIndices',
   'apm_oss.transactionIndices',
-  'apm_oss.metricsIndices'
+  'apm_oss.metricsIndices',
+  'apm_oss.profileIndices'
 ];
 
 export async function getApmIndexSettings({

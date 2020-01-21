@@ -27,6 +27,10 @@ const metricsBreadcrumb = i18n.translate('xpack.apm.breadcrumb.metricsTitle', {
   defaultMessage: 'Metrics'
 });
 
+const profileBreadcrumb = i18n.translate('xpack.apm.breadcrumb.profileTitle', {
+  defaultMessage: 'Profile'
+});
+
 interface RouteParams {
   serviceName: string;
 }
@@ -150,6 +154,14 @@ export const routes: BreadcrumbRoute[] = [
     component: () => <ServiceDetails tab="metrics" />,
     breadcrumb: metricsBreadcrumb,
     name: RouteName.METRICS
+  },
+  // profile
+  {
+    exact: true,
+    path: '/services/:serviceName/profile',
+    component: () => <ServiceDetails tab="profile" />,
+    breadcrumb: profileBreadcrumb,
+    name: RouteName.PROFILE
   },
   // service nodes, only enabled for java agents for now
   {

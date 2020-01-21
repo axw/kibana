@@ -4,9 +4,6 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
-export enum ProcessorEvent {
-  transaction = 'transaction',
-  error = 'error',
-  metric = 'metric',
-  profile = 'profile'
-}
+import { ProfileRaw } from '../raw/ProfileRaw';
+
+export type Profile = ProfileRaw;

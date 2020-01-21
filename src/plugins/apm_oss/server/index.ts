@@ -28,6 +28,7 @@ export const config = {
     metricsIndices: schema.string({ defaultValue: 'apm-*' }),
     sourcemapIndices: schema.string({ defaultValue: 'apm-*' }),
     onboardingIndices: schema.string({ defaultValue: 'apm-*' }),
+    profileIndices: schema.string({ defaultValue: 'apm-*' }),
     indexPattern: schema.string({ defaultValue: 'apm-*' }),
   }),
 };

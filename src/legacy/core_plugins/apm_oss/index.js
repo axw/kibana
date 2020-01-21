@@ -38,6 +38,7 @@ export default function apmOss(kibana) {
         spanIndices: Joi.string().default('apm-*'),
         metricsIndices: Joi.string().default('apm-*'),
         onboardingIndices: Joi.string().default('apm-*'),
+        profileIndices: Joi.string().default('apm-*'),
       }).default();
     },
 
@@ -52,6 +53,7 @@ export default function apmOss(kibana) {
             'spanIndices',
             'metricsIndices',
             'onboardingIndices',
+            'profileIndices',
           ].map(type => server.config().get(`apm_oss.${type}`))
         )
       );

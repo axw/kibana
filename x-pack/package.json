@@ -220,6 +220,7 @@
     "cytoscape": "^3.10.0",
     "cytoscape-dagre": "^2.2.2",
     "d3": "3.5.17",
+    "d3-flame-graph": "^2.1.9",
     "d3-scale": "1.0.7",
     "dedent": "^0.7.0",
     "del": "^5.1.0",

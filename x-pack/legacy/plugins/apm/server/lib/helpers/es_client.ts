@@ -94,7 +94,8 @@ async function getParamsForSearchRequest(
       'apm_oss.onboardingIndices',
       'apm_oss.spanIndices',
       'apm_oss.transactionIndices',
-      'apm_oss.metricsIndices'
+      'apm_oss.metricsIndices',
+      'apm_oss.profileIndices'
     )
   );
   return {

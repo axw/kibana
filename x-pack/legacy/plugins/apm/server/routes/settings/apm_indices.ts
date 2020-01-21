@@ -44,7 +44,8 @@ export const saveApmIndicesRoute = createRoute(() => ({
       'apm_oss.onboardingIndices': t.string,
       'apm_oss.spanIndices': t.string,
       'apm_oss.transactionIndices': t.string,
-      'apm_oss.metricsIndices': t.string
+      'apm_oss.metricsIndices': t.string,
+      'apm_oss.profileIndices': t.string
     })
   },
   handler: async ({ context, request }) => {
