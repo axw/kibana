@@ -116,7 +116,9 @@ export interface FleetAppContext {
   httpSetup?: HttpServiceSetup;
 }
 
-export type FleetSetupContract = void;
+export interface FleetSetupContract {
+  packagePolicyService: typeof packagePolicyService;
+};
 
 const allSavedObjectTypes = [
   OUTPUT_SAVED_OBJECT_TYPE,
@@ -191,7 +193,7 @@ export class FleetPlugin
     this.logger = this.initializerContext.logger.get();
   }
 
-  public async setup(core: CoreSetup, deps: FleetSetupDeps) {
+  public async setup(core: CoreSetup, deps: FleetSetupDeps): Promise<FleetSetupContract> {
     this.httpSetup = core.http;
     this.licensing$ = deps.licensing.license$;
     this.encryptedSavedObjectsSetup = deps.encryptedSavedObjects;
@@ -279,6 +281,10 @@ export class FleetPlugin
         }
       }
     }
+
+    return {
+      packagePolicyService,
+    };
   }
 
   public async start(core: CoreStart, plugins: FleetStartDeps): Promise<FleetStartContract> {

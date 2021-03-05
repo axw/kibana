@@ -89,10 +89,11 @@ export const deleteAgentConfigurationRoute = createRoute({
       `Deleting config ${service.name}/${service.environment} (${config._id})`
     );
 
-    return await deleteConfiguration({
+    await deleteConfiguration({
       configurationId: config._id,
       setup,
     });
+    return await updatePackagePolicies(context, setup);
   },
 });
 
@@ -130,13 +131,40 @@ export const createOrUpdateAgentConfigurationRoute = createRoute({
       }`
     );
 
-    return await createOrUpdateConfiguration({
+    await createOrUpdateConfiguration({
       configurationId: config?._id,
       configurationIntake: body,
       setup,
     });
+    return await updatePackagePolicies(context, setup);
   },
 });
+
+async function updatePackagePolicies(context, setup) {
+  const configurations = await listConfigurations({ setup });
+  const agentConfigValue = configurations.map(config => ({service: config.service, settings: config.settings}));
+  const packagePolicies = await context.plugins.fleet.packagePolicyService.list(context.core.savedObjects.client, {
+    // TODO(axw) iterate through all pages. Unlikely to be more than a handful,
+    // if even more than one, but better to be on the safe side.
+    page: 1,
+    perPage: 20,
+    kuery: 'ingest-package-policies.package.name:apm'
+  });
+  for (let item of packagePolicies.items) {
+    const { id, revision, updated_at, updated_by, ...packagePolicy } = item;
+    packagePolicy.inputs[0].config = {
+      agent_config: {
+        value: agentConfigValue,
+      },
+    };
+    await context.plugins.fleet.packagePolicyService.update(
+      context.core.savedObjects.client,
+      context.core.elasticsearch.client,
+      id,
+      packagePolicy,
+    );
+  }
+}
 
 const searchParamsRt = t.intersection([
   t.type({ service: serviceRt }),

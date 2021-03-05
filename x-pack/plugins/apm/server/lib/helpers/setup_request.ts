@@ -70,7 +70,7 @@ export async function setupRequest<TParams extends SetupRequestParams>(
 ): Promise<InferSetup<TParams>> {
   return withApmSpan('setup_request', async () => {
     const { config, logger } = context;
-    const { query } = context.params;
+    const query = context.params?.query || {};
 
     const [indices, includeFrozen] = await Promise.all([
       getApmIndices({
@@ -88,7 +88,7 @@ export async function setupRequest<TParams extends SetupRequestParams>(
       indices,
       apmEventClient: createApmEventClient({
         esClient: context.core.elasticsearch.client.asCurrentUser,
-        debug: context.params.query._debug,
+        debug: query._debug,
         request,
         indices,
         options: { includeFrozen },

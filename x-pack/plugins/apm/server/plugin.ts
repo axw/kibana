@@ -15,7 +15,11 @@ import {
   Logger,
   Plugin,
   PluginInitializerContext,
-} from 'src/core/server';
+  RequestHandlerContext,
+  SavedObjectsClient,
+} from '../../../../src/core/server';
+import { FleetSetupContract, FleetStartContract } from '../../fleet/server';
+import { NewPackagePolicy, UpdatePackagePolicy} from '../../fleet/common/types/models';
 import { APMConfig, APMXPackConfig } from '.';
 import { mergeConfigs } from './index';
 import { APMOSSPluginSetup } from '../../../../src/plugins/apm_oss/server';
@@ -27,11 +31,13 @@ import { AlertingPlugin } from '../../alerts/server';
 import { CloudSetup } from '../../cloud/server';
 import { PluginSetupContract as FeaturesPluginSetup } from '../../features/server';
 import { LicensingPluginSetup } from '../../licensing/server';
-import { MlPluginSetup } from '../../ml/server';
+import { MlPluginSetup, MlPluginStart } from '../../ml/server';
 import { ObservabilityPluginSetup } from '../../observability/server';
 import { SecurityPluginSetup } from '../../security/server';
 import { TaskManagerSetupContract } from '../../task_manager/server';
 import { APM_FEATURE, registerFeaturesUsage } from './feature';
+import { setupRequest } from './lib/helpers/setup_request';
+import { listConfigurations } from './lib/settings/agent_configuration/list_configurations';
 import { registerApmAlerts } from './lib/alerts/register_apm_alerts';
 import { createApmTelemetry } from './lib/apm_telemetry';
 import { createApmEventClient } from './lib/helpers/create_es_client/create_apm_event_client';
@@ -40,6 +46,7 @@ import { createApmAgentConfigurationIndex } from './lib/settings/agent_configura
 import { getApmIndices } from './lib/settings/apm_indices/get_apm_indices';
 import { createApmCustomLinkIndex } from './lib/settings/custom_link/create_custom_link_index';
 import { createApmApi } from './routes/create_apm_api';
+import { APMRequestHandlerContext } from './routes/typings';
 import { apmIndices, apmTelemetry } from './saved_objects';
 import { createElasticCloudInstructions } from './tutorial/elastic_cloud';
 import { uiSettings } from './ui_settings';
@@ -77,6 +84,7 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
       features: FeaturesPluginSetup;
       security?: SecurityPluginSetup;
       ml?: MlPluginSetup;
+      fleet?: FleetSetupContract;
     }
   ) {
     this.logger = this.initContext.logger.get();
@@ -152,6 +160,7 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
         observability: plugins.observability,
         security: plugins.security,
         ml: plugins.ml,
+	fleet: plugins.fleet,
       },
     });
 
@@ -193,7 +202,13 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
     };
   }
 
-  public start(core: CoreStart) {
+  public start(
+    core: CoreStart,
+    plugins: {
+      fleet?: FleetStartContract;
+      ml?: MlPluginStart;
+    }
+  ) {
     if (this.currentConfig == null || this.logger == null) {
       throw new Error('APMPlugin needs to be setup before calling start()');
     }
@@ -210,6 +225,66 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
       config: this.currentConfig,
       logger: this.logger,
     });
+
+    if (plugins.fleet) {
+      // Register Fleet package policy creation and update callbacks, so we can
+      // inject APM Agent configuration into the server policies.
+      //
+      // TODO these callbacks are exactly the same aside from one dealing
+      // with a NewPackagePolicy and the other dealing with UpdatePackagePolicy.
+      // They should probably share code.
+      plugins.fleet.registerExternalCallback('packagePolicyCreate', async (
+          packagePolicy: NewPackagePolicy,
+	  context: RequestHandlerContext,
+	  request: KibanaRequest
+        ): Promise<NewPackagePolicy> => {
+          if (packagePolicy.package?.name !== 'apm') {
+            return packagePolicy;
+	  }
+	  // TODO: convert a RequestHandlerContext to APMRequestHandlerContext more appropriately.
+          const apmContext = {
+		  ...context,
+		  plugins,
+		  config: this.currentConfig,
+		  logger: this.logger,
+	  };
+	  const setup = await setupRequest(apmContext, request);
+	  const configurations = await listConfigurations({setup});
+	  const agentConfigValue = configurations.map(config => ({service: config.service, settings: config.settings}));
+	  packagePolicy.inputs[0].config = {
+	    agent_config: {
+	      value: agentConfigValue
+	    },
+	  }
+	  return packagePolicy;
+        }
+      );
+      plugins.fleet.registerExternalCallback('packagePolicyUpdate', async (
+          packagePolicy: UpdatePackagePolicy,
+	  context: RequestHandlerContext,
+	  request: KibanaRequest
+        ): Promise<UpdatePackagePolicy> => {
+          if (packagePolicy.package?.name !== 'apm') {
+            return packagePolicy;
+	  }
+          const apmContext = {
+		  ...context,
+		  plugins,
+		  config: this.currentConfig,
+		  logger: this.logger,
+	  };
+	  const setup = await setupRequest(apmContext, request);
+	  const configurations = await listConfigurations({setup});
+	  const agentConfigValue = configurations.map(config => ({service: config.service, settings: config.settings}));
+	  packagePolicy.inputs[0].config = {
+	    agent_config: {
+	      value: agentConfigValue
+	    },
+	  }
+	  return packagePolicy;
+        }
+      );
+    }
   }
 
   public stop() {}
