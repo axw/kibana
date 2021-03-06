@@ -15,7 +15,10 @@ import {
   Logger,
   Plugin,
   PluginInitializerContext,
+  RequestHandlerContext,
 } from 'src/core/server';
+import { FleetStartContract } from '../../fleet/server';
+import { NewPackagePolicy, UpdatePackagePolicy} from '../../fleet/common/types/models';
 import { APMConfig, APMXPackConfig } from '.';
 import { mergeConfigs } from './index';
 import { APMOSSPluginSetup } from '../../../../src/plugins/apm_oss/server';
@@ -30,6 +33,7 @@ import { LicensingPluginSetup } from '../../licensing/server';
 import { MlPluginSetup } from '../../ml/server';
 import { ObservabilityPluginSetup } from '../../observability/server';
 import { SecurityPluginSetup } from '../../security/server';
+import { ApiKey } from '../../security/common/model';
 import { TaskManagerSetupContract } from '../../task_manager/server';
 import { APM_FEATURE, registerFeaturesUsage } from './feature';
 import { registerApmAlerts } from './lib/alerts/register_apm_alerts';
@@ -193,7 +197,13 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
     };
   }
 
-  public start(core: CoreStart) {
+  public start(
+    core: CoreStart,
+    plugins: {
+      fleet?: FleetStartContract;
+      security?: SecurityPluginStart;
+    }
+  ) {
     if (this.currentConfig == null || this.logger == null) {
       throw new Error('APMPlugin needs to be setup before calling start()');
     }
@@ -210,6 +220,64 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
       config: this.currentConfig,
       logger: this.logger,
     });
+
+    if (plugins.fleet && plugins.security?.authc && plugins.security.authc.apiKeys.areAPIKeysEnabled()) {
+      const updatePackagePolicy = async function (packagePolicy, context, request) {
+        const configured = packagePolicy.inputs[0].vars.kibana_api_key.value;
+        if (configured) {
+          // The policy is already configured with an API key, check that it is valid.
+          const apiKeyID = configured.split(':', 2)[0];
+          const esClient = context.core.elasticsearch.client;
+          const apiResponse = await context.core.elasticsearch.client.asInternalUser.security.getApiKey<{
+            api_keys: ApiKey[];
+          }>({id: apiKeyID});
+          if (apiResponse.body.api_keys && !apiResponse.body.api_keys[0].invalidated) {
+            return packagePolicy;
+          }
+        }
+
+        // The policy is not configured with a valid API key, so create a new one.
+        const apiKey = await plugins.security.authc.apiKeys.create(request, {
+          name: 'apm_central_config_reader',
+          role_descriptors: {
+            apm_central_config_reader: {
+              applications: [{
+                application: 'kibana-.kibana',
+                privileges: ['feature_apm.read'],
+                resources: ['*']
+              }]
+            }
+          }
+        });
+        packagePolicy.inputs[0].vars.kibana_api_key.value = `${apiKey.id}:${apiKey.api_key}`
+        return packagePolicy;
+      };
+
+      // Register Fleet package policy creation and update callbacks,
+      // so we can inject an API key into the APM policies.
+      plugins.fleet.registerExternalCallback('packagePolicyCreate', async (
+          packagePolicy: NewPackagePolicy,
+          context: RequestHandlerContext,
+          request: KibanaRequest
+        ): Promise<NewPackagePolicy> => {
+          if (packagePolicy.package?.name !== 'apm') {
+            return packagePolicy;
+          }
+          return await updatePackagePolicy(packagePolicy, context, request);
+        }
+      );
+      plugins.fleet.registerExternalCallback('packagePolicyUpdate', async (
+          packagePolicy: UpdatePackagePolicy,
+          context: RequestHandlerContext,
+          request: KibanaRequest
+        ): Promise<UpdatePackagePolicy> => {
+          if (packagePolicy.package?.name !== 'apm') {
+            return packagePolicy;
+          }
+          return await updatePackagePolicy(packagePolicy, context, request);
+        }
+      );
+    }
   }
 
   public stop() {}
