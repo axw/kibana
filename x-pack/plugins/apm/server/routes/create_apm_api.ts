@@ -106,6 +106,11 @@ import {
   transactionErrorCountChartPreview,
   transactionDurationChartPreview,
 } from './alerts/chart_preview';
+import {
+  deleteSourceMapRoute,
+  listSourceMapsRoute,
+  uploadSourceMapRoute,
+} from './sourcemaps';
 
 const createApmApi = () => {
   const api = createApi()
@@ -214,7 +219,12 @@ const createApmApi = () => {
     // Alerting
     .add(transactionErrorCountChartPreview)
     .add(transactionDurationChartPreview)
-    .add(transactionErrorRateChartPreview);
+    .add(transactionErrorRateChartPreview)
+
+    // Source maps
+    .add(deleteSourceMapRoute)
+    .add(listSourceMapsRoute)
+    .add(uploadSourceMapRoute);
 
   return api;
 };

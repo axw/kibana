@@ -21,7 +21,8 @@
     "security",
     "ml",
     "home",
-    "maps"
+    "maps",
+    "fleet"
   ],
   "server": true,
   "ui": true,

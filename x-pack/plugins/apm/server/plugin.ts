@@ -28,6 +28,7 @@ import { CloudSetup } from '../../cloud/server';
 import { PluginSetupContract as FeaturesPluginSetup } from '../../features/server';
 import { LicensingPluginSetup } from '../../licensing/server';
 import { MlPluginSetup } from '../../ml/server';
+import { FleetSetupContract, FleetStartContract } from '../../fleet/server';
 import { ObservabilityPluginSetup } from '../../observability/server';
 import { SecurityPluginSetup } from '../../security/server';
 import { TaskManagerSetupContract } from '../../task_manager/server';
@@ -77,6 +78,7 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
       features: FeaturesPluginSetup;
       security?: SecurityPluginSetup;
       ml?: MlPluginSetup;
+      fleet?: FleetSetupContract;
     }
   ) {
     this.logger = this.initContext.logger.get();
@@ -152,6 +154,7 @@ export class APMPlugin implements Plugin<APMPluginSetup> {
         observability: plugins.observability,
         security: plugins.security,
         ml: plugins.ml,
+        fleet: plugins.fleet,
       },
     });
 
